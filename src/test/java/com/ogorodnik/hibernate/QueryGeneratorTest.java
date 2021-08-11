@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-//ORM - Object relation mapping
 public class QueryGeneratorTest {
     private Object id;
     QueryGenerator queryGenerator;
@@ -13,7 +12,6 @@ public class QueryGeneratorTest {
 
     @Before
     public void before(){
-        id = 4;
         queryGenerator = new QueryGenerator();
 
         person = new Person();
@@ -64,8 +62,15 @@ public class QueryGeneratorTest {
 
     @Test
     public void testUpdate() throws IllegalAccessException {
-        String updateSql = queryGenerator.update(person, id);
-        String expectedSql = "UPDATE persons SET person_name = 'Alex', salary = '45.5' WHERE id = 4";
+        String updateSql = queryGenerator.update(person);
+        String expectedSql = "UPDATE persons SET person_name = 'Ogorodnik', salary = '45.5' WHERE id = 5";
+        assertEquals(expectedSql, updateSql);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testUpdateWithNoId() throws IllegalAccessException {
+        String updateSql = queryGenerator.update(personWithoutId);
+        String expectedSql = "UPDATE persons SET person_name = 'Alex', salary = '54.4' WHERE x = 10";
         assertEquals(expectedSql, updateSql);
     }
 }

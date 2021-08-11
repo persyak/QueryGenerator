@@ -91,7 +91,9 @@ public class QueryGenerator {
         return stringBuilder.toString();
     }
 
-    public String update(Object value, Object id) throws IllegalAccessException {
+    public String update(Object value) throws IllegalAccessException {
+        String idName = null;
+        Object idValue = null;
         StringBuilder stringBuilder = new StringBuilder("UPDATE ");
         Class<?> clazz = value.getClass();
         stringBuilder.append(getTableName(clazz));
@@ -105,13 +107,20 @@ public class QueryGenerator {
             if (columnAnnotation != null) {
                 String columnName = columnAnnotation.name().isEmpty() ?
                         declaredField.getName() : columnAnnotation.name();
-                if (!"id".equals(columnName)) {
+                if ("id".equals(columnName)) {
+                    idName = columnName;
+                    idValue = field;
+                }
+                else {
                     stringJoiner.add(tmp.append(columnName).append(" = '").append(field).append("'"));
                 }
             }
         }
         stringBuilder.append(stringJoiner);
-        stringBuilder.append(" WHERE ").append(getId(clazz)).append(" = ").append(id);
+        if(idName == null){
+            throw new IllegalArgumentException("'id' column is missing");
+        }
+        stringBuilder.append(" WHERE ").append(idName).append(" = ").append(idValue);
         return stringBuilder.toString();
     }
 }
