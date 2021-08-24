@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.StringJoiner;
 
 public class QueryGenerator<T, V> {
+    private final static String WHERE_OPERATOR = " WHERE ";
 
     private String getTableName(Class<?> clazz) {
         Table annotation = clazz.getAnnotation(Table.class);
@@ -59,7 +60,7 @@ public class QueryGenerator<T, V> {
 
     public String getById(Class<?> clazz, T id) {
         StringBuilder stringBuilder = preQueryGenerator(clazz);
-        stringBuilder.append(" WHERE ");
+        stringBuilder.append(WHERE_OPERATOR);
         stringBuilder.append(getId(clazz));
         stringBuilder.append(" = ").append(id).append(";");
         return stringBuilder.toString();
@@ -67,7 +68,7 @@ public class QueryGenerator<T, V> {
 
     public String delete(Class<?> clazz, T id) {
         return "DELETE FROM " + getTableName(clazz) +
-                " WHERE " +
+                WHERE_OPERATOR +
                 getId(clazz) +
                 " = " + id + ";";
     }
@@ -118,7 +119,7 @@ public class QueryGenerator<T, V> {
         if (idName == null) {
             throw new IllegalArgumentException("'id' column is missing");
         }
-        stringBuilder.append(" WHERE ").append(idName).append(" = ").append(idValue);
+        stringBuilder.append(WHERE_OPERATOR).append(idName).append(" = ").append(idValue);
         return stringBuilder.toString();
     }
 }
