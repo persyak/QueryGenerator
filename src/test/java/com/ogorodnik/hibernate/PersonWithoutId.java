@@ -1,6 +1,6 @@
 package com.ogorodnik.hibernate;
 
-@Table (name = "persons")
+@Table(name = "persons")
 public class PersonWithoutId {
     @Column
     private int x;
@@ -11,27 +11,27 @@ public class PersonWithoutId {
     @Column
     private double salary;
 
-    public int getX(){
+    public int getX() {
         return x;
     }
 
-    public void setX(int x){
+    public void setX(int x) {
         this.x = x;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public void setName(String name){
+    public void setName(String name) {
         this.name = name;
     }
 
-    public double getSalary(){
+    public double getSalary() {
         return salary;
     }
 
-    public void setSalary(double salary){
+    public void setSalary(double salary) {
         this.salary = salary;
     }
 }

@@ -2,17 +2,18 @@ package com.ogorodnik.hibernate;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
-public class QueryGeneratorTest {
-    private Object id;
-    QueryGenerator queryGenerator;
+public class QueryGeneratorTest<T, V> {
+    private Object id = 4;
+    QueryGenerator<T, V> queryGenerator;
     Person person;
     PersonWithoutId personWithoutId;
 
     @Before
-    public void before(){
-        queryGenerator = new QueryGenerator();
+    public void before() {
+        queryGenerator = new QueryGenerator<>();
 
         person = new Person();
         person.setId(5);
@@ -26,36 +27,36 @@ public class QueryGeneratorTest {
     }
 
     @Test
-    public void testGetAll(){
+    public void testGetAll() {
         String getAllSql = queryGenerator.getAll(Person.class);
         String expectedSql = "SELECT id, person_name, salary FROM persons;";
         assertEquals(expectedSql, getAllSql);
     }
 
     @Test
-    public void testGetById(){
-        String getByIdSql = queryGenerator.getById(Person.class, id);
+    public void testGetById() {
+        String getByIdSql = queryGenerator.getById(Person.class, (T) id);
         String expectedSql = "SELECT id, person_name, salary FROM persons WHERE id = 4;";
         assertEquals(expectedSql, getByIdSql);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testGetByIdWithNoId(){
-        String getByIdSql = queryGenerator.getById(PersonWithoutId.class, id);
+    public void testGetByIdWithNoId() {
+        String getByIdSql = queryGenerator.getById(PersonWithoutId.class, (T) id);
         String expectedSql = "SELECT id, person_name, salary FROM persons WHERE id = 4;";
         assertEquals(expectedSql, getByIdSql);
     }
 
     @Test
-    public void testDelete(){
-        String deleteSql = queryGenerator.delete(Person.class, id);
+    public void testDelete() {
+        String deleteSql = queryGenerator.delete(Person.class, (T) id);
         String expectedSql = "DELETE FROM persons WHERE id = 4;";
         assertEquals(expectedSql, deleteSql);
     }
 
     @Test
     public void testInsert() throws IllegalAccessException {
-        String insertSql = queryGenerator.insert(person);
+        String insertSql = queryGenerator.insert((V) person);
         String expectedSql = "INSERT INTO persons (id, person_name, salary) VALUES ('5', 'Alex', '45.5');";
         assertEquals(expectedSql, insertSql);
     }
@@ -63,14 +64,14 @@ public class QueryGeneratorTest {
     @Test
     public void testUpdate() throws IllegalAccessException {
         String updateSql = queryGenerator.update(person);
-        String expectedSql = "UPDATE persons SET person_name = 'Ogorodnik', salary = '45.5' WHERE id = 5";
+        String expectedSql = "UPDATE persons SET person_name = 'Alex', salary = '45.5' WHERE id = 5";
         assertEquals(expectedSql, updateSql);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testUpdateWithNoId() throws IllegalAccessException {
         String updateSql = queryGenerator.update(personWithoutId);
-        String expectedSql = "UPDATE persons SET person_name = 'Alex', salary = '54.4' WHERE x = 10";
+        String expectedSql = "UPDATE persons SET person_name = 'Ogorodnik', salary = '54.4' WHERE x = 10";
         assertEquals(expectedSql, updateSql);
     }
 }

@@ -3,9 +3,9 @@ package com.ogorodnik.hibernate;
 import java.lang.reflect.Field;
 import java.util.StringJoiner;
 
-public class QueryGenerator {
+public class QueryGenerator<T, V> {
 
-    private String getTableName(Class<?> clazz){
+    private String getTableName(Class<?> clazz) {
         Table annotation = clazz.getAnnotation(Table.class);
         if (annotation == null) {
             throw new IllegalArgumentException("@Table is missing");
@@ -13,7 +13,7 @@ public class QueryGenerator {
         return annotation.name().isEmpty() ? clazz.getName() : annotation.name();
     }
 
-    private StringJoiner stringJoinerFields(Class<?> clazz){
+    private StringJoiner stringJoinerFields(Class<?> clazz) {
         StringJoiner stringJoiner = new StringJoiner(", ");
         for (Field declaredField : clazz.getDeclaredFields()) {
             Column columnAnnotation = declaredField.getAnnotation(Column.class);
@@ -43,9 +43,8 @@ public class QueryGenerator {
                         declaredField.getName() : columnAnnotation.name();
                 if (columnName.equals("id")) {
                     return columnName;
-                }
-                else{
-                     throw new IllegalArgumentException("'id' column is missing");
+                } else {
+                    throw new IllegalArgumentException("'id' column is missing");
                 }
             }
         }
@@ -58,7 +57,7 @@ public class QueryGenerator {
         return stringBuilder.toString();
     }
 
-    public String getById(Class<?> clazz, Object id) {
+    public String getById(Class<?> clazz, T id) {
         StringBuilder stringBuilder = preQueryGenerator(clazz);
         stringBuilder.append(" WHERE ");
         stringBuilder.append(getId(clazz));
@@ -66,14 +65,14 @@ public class QueryGenerator {
         return stringBuilder.toString();
     }
 
-    public String delete(Class<?> clazz, Object id) {
+    public String delete(Class<?> clazz, T id) {
         return "DELETE FROM " + getTableName(clazz) +
                 " WHERE " +
                 getId(clazz) +
                 " = " + id + ";";
     }
 
-    public String insert(Object value) throws IllegalAccessException {
+    public String insert(V value) throws IllegalAccessException {
         StringBuilder stringBuilder = new StringBuilder("INSERT INTO ");
         Class<?> clazz = value.getClass();
         stringBuilder.append(getTableName(clazz));
@@ -110,14 +109,13 @@ public class QueryGenerator {
                 if ("id".equals(columnName)) {
                     idName = columnName;
                     idValue = field;
-                }
-                else {
+                } else {
                     stringJoiner.add(tmp.append(columnName).append(" = '").append(field).append("'"));
                 }
             }
         }
         stringBuilder.append(stringJoiner);
-        if(idName == null){
+        if (idName == null) {
             throw new IllegalArgumentException("'id' column is missing");
         }
         stringBuilder.append(" WHERE ").append(idName).append(" = ").append(idValue);
